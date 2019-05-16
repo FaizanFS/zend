@@ -5,9 +5,21 @@ class Application_Model_DbTable_Employee extends Zend_Db_Table_Abstract
 
     protected $_name = 'employees';
     
+    private function getFrontControllerInstance() : Zend_Controller_Front
+    {
+        return Zend_Controller_Front::getInstance();
+    }
+    
+    public function readAll()
+    {
+        $select = $this->getDefaultAdapter()->select();
+        $select->from($this->_name, '*');
+        return $select;
+    }
+    
     public function createEmployee()
     {
-        $front = Zend_Controller_Front::getInstance();
+        $front = $this->getFrontControllerInstance();
         $request = $front->getRequest();
         $data = array(
             'name' => $request->getPost('name'),
@@ -19,7 +31,7 @@ class Application_Model_DbTable_Employee extends Zend_Db_Table_Abstract
     
     public function editEmployee()
     {
-        $front = Zend_Controller_Front::getInstance();
+        $front = $this->getFrontControllerInstance();
         $request = $front->getRequest();
         $data = array(
             'name' => $request->getPost('name'),
@@ -32,7 +44,7 @@ class Application_Model_DbTable_Employee extends Zend_Db_Table_Abstract
     
     public function deleteEmployee()
     {
-        $front = Zend_Controller_Front::getInstance();
+        $front = $this->getFrontControllerInstance();
         $request = $front->getRequest();
         $where = array('id = ?' => $request->getParam('id'));
         $this->delete($where);

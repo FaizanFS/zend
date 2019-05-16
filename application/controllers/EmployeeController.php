@@ -10,9 +10,14 @@ class EmployeeController extends Zend_Controller_Action
 
     public function indexAction()
     {
+        $page = $this->getRequest()->getParam('page','1');
         $employeeModel = new Application_Model_DbTable_Employee();
-        $employees = $employeeModel->fetchAll();
-        $this->view->employees = $employees;
+        $data = $employeeModel->readAll();
+        $adapter = new Zend_Paginator_Adapter_DbSelect($data);
+        $paginator = new Zend_Paginator($adapter);
+        $paginator->setItemCountPerPage(1);
+        $paginator->setCurrentPageNumber($page);
+        $this->view->data = $paginator;
     }
 
     public function createAction()
@@ -37,8 +42,10 @@ class EmployeeController extends Zend_Controller_Action
         $employee = $employeeModel->fetchRow('id = '.$id);
         $employeeForm = new Application_Form_Employee();
         if($request->isPost()) {
-            $employeeModel->editEmployee();
-            $this->redirect('employee');
+            if($employeeForm->isValid($request->getPost())){
+                $employeeModel->editEmployee();
+                $this->redirect('employee');   
+            }
         }
         $this->view->employee = $employee;
         $this->view->employeeForm = $employeeForm;
@@ -52,10 +59,3 @@ class EmployeeController extends Zend_Controller_Action
     }
     
 }
-
-
-
-
-
-
-
